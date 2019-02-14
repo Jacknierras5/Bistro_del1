@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="da">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bistro Babushka</title>
+    <link href="https://fonts.googleapis.com/css?family=Major+Mono+Display" rel="stylesheet">
+
+
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant', serif;
+
+        }
+
+        .kategorier {
+            border-radius: 2%;
+            margin: 1rem;
+            padding: 1rem;
+            ;
+            background: linear-gradient(to bottom, #ffffff -20%, #ff9933 80%);
+        }
+
+        #liste {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+
+        }
+
+        .kategorier img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .popup img {
+            display: block;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h2 {
+            color: black;
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1rem;
+        }
+
+
+        /* Menu Placering */
+        .menu {
+            text-align: center;
+            background-color: white;
+            padding: .5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Menu knapper */
+        button {
+            background-color: orange;
+            color: white;
+            margin: .5rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: .2rem;
+            padding-bottom: .2rem;
+            border-radius: 2rem;
+            font-size: 1rem;
+        }
+
+        /* Menu valte knap */
+        .valgt {
+            background-color: red;
+            color: white;
+            border: none;
+        }
+
+
+        #singleview {
+            box-sizing: border-box;
+            width: 100%;
+            height: 100vw;
+            background: linear-gradient(to bottom, #ffffff -20%, #ff9933 80%);
+        }
+
+        #indhold {
+            box-sizing: border-box;
+            background-color: white;
+            border: 1px solid black;
+            width: 90vw;
+            height: auto;
+            margin: auto;
+            padding: 50px;
+            top: 0;
+        }
+
+        #tilbage {
+            box-sizing: border-box;
+            text-align: left;
+
+        }
+
+        #tilbage button {
+            font-size: 3rem;
+        }
+
+    </style>
+
+
+
+</head>
+
+<body>
+
+    <!--
+    <div class="babushka_overskrift">
+        <h1><small>Bistro</small><br><b>BABUSHKA</b></h1>
+    </div>
+    <header>
+        <nav class="menu">
+            <button class="filter valgt" data-hold="alle">Forside</button>
+            <button class="filter" data-hold="forretter">Forret</button>
+            <button class="filter" data-hold="hovedretter">Hovedret</button>
+            <button class="filter" data-hold="desserter">Dessert</button>
+            <button class="filter" data-hold="sideorders">Sideorder</button>
+            <button class="filter" data-hold="drikkevarer">Drikkevarer</button>
+        </nav>
+    </header>
+    <h2>Forside</h2>
+-->
+
+
+
+    <section id=liste></section>
+
+    <section>
+        <div id="singleview">
+            <div id="tilbage"><button>⇦</button> </div>
+            <div id="indhold">
+            </div>
+        </div>
+    </section>
+
+
+
+
+
+    <script>
+        let urlParams = new URLSearchParams(window.location.search);
+        let id = urlParams.get("id");
+        let alleKategorier = [];
+        let filter = "alle";
+        let kategori;
+        document.addEventListener("DOMContentLoaded", start);
+
+        function start() {
+            //            let dest = document.querySelector("#liste");
+            async function getJson() {
+                let jsonData = await fetch("https://mandalskeawebspace.dk/claude_php/clean_up_spreadsheet.php?id=1jxxxFoWBuMJ1qhQ9BQIAyKHmP38XtAF9_sQr0xo5JLo");
+                alleKategorier = await jsonData.json();
+                alleKategorier.forEach(obj => {
+                    if (obj.id == id) {
+                        kategori = obj;
+                    }
+                })
+                åben();
+            }
+
+            function åben() {
+                document.querySelector("#indhold").innerHTML = `
+                        <article class="kategorier">
+                            <h2>${kategori.navn}</h2>
+                            <img src="imgs/small/${kategori.billede}-sm.jpg" alt="${kategori.navn}">
+                                <br>
+                            <p>Om: ${kategori.lang}</p><br>
+                            <p>Oprindelse: ${kategori.oprindelse}</p>
+                                <br>
+                            <b>Pris: ${kategori.pris},-</b>
+                        </article>`;
+            }
+            document.querySelector("#tilbage button").addEventListener("click", () => {
+                location.href = "01-loopView.html"
+            })
+            //            document.querySelectorAll(".filter").forEach(elm => {
+            //                elm.addEventListener("click", filtrering);
+            //            })
+            //
+            //            function filtrering() {
+            //                filter = this.getAttribute("data-hold");
+            //                document.querySelector("h2").textContent = this.textContent;
+            //                document.querySelectorAll(".filter").forEach(elm => {
+            //                    elm.classList.remove("valgt");
+            //                })
+            //                this.classList.add("valgt");
+            //                visKategorier();
+            //            }
+            getJson();
+        }
+
+    </script>
+</body>
+
+</html>
