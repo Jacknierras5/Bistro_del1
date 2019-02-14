@@ -144,3 +144,126 @@
 
 
 </head>
+
+
+<body>
+    <div id="popup">
+        <div id="luk"><button>X</button></div>
+        <div id="indhold"></div>
+    </div>
+
+
+    <div class="round">
+        <img src="logo.png" alt="">
+    </div>
+
+    <header>
+        <nav class="menu">
+            <button class="filter valgt" data-hold="alle">Forside</button>
+            <button class="filter" data-hold="forretter">Forret</button>
+            <button class="filter" data-hold="hovedretter">Hovedret</button>
+            <button class="filter" data-hold="desserter">Dessert</button>
+            <button class="filter" data-hold="sideorders">Små retter</button>
+            <button class="filter" data-hold="drikkevarer">Drikkevarer</button>
+        </nav>
+
+    </header>
+
+    <section id=liste></section>
+
+    <footer>
+        <div>
+            <p>Adresse: Solvænget 97 <br> 1234 Køkbenhavn Ø </p>
+        </div>
+        <br>
+        <div>
+            <p>Åbningstider: Mandag-fredag 10:00-22:00 <br> Lørdag 12:00-23:00</p>
+        </div>
+    </footer>
+
+
+
+
+    <script>
+        let alleKategorier = [];
+        let filter = "alle";
+        document.addEventListener("DOMContentLoaded", start);
+
+        function start() {
+            let dest = document.querySelector("#liste");
+            let temp = document.querySelector("template");
+            async function getJson() {
+                let jsonData = await fetch("https://mandalskeawebspace.dk/claude_php/clean_up_spreadsheet.php?id=1jxxxFoWBuMJ1qhQ9BQIAyKHmP38XtAF9_sQr0xo5JLo");
+                alleKategorier = await jsonData.json();
+                //sorteree efter navn
+                alleKategorier.sort((a, b) => {
+                    return a.navn.localeCompare(b.navn);
+                })
+                visKategorier();
+            }
+
+            function visKategorier() {
+                dest.innerHTML = "";
+                alleKategorier.forEach(kategorier => {
+                    if (filter == "alle" || filter == kategorier.kategori) {
+                        let template = `
+                            <article class="kategorier">
+                            <h2>${kategorier.navn}</h2>
+                            <img src="bistro_billeder/imgs/small/${kategorier.billede}-sm.jpg"</p>
+                                <br>
+                            <p>${kategorier.kort}</p><br>
+                            <p>Oprindelse: ${kategorier.oprindelse}</p>
+                                <br>
+                            <p>Pris: ${kategorier.pris},-</p>
+                        </article>
+                        `;
+                        dest.insertAdjacentHTML("beforeend", template);
+                        dest.lastElementChild.addEventListener("click", åben);
+
+                        function åben() {
+                            document.querySelector("#indhold").innerHTML = `
+                            <article class="popup">
+                            <h2>${kategorier.navn}</h2>
+                            <img src="bistro_billeder/imgs/small/${kategorier.billede}-sm.jpg"</p>
+                                <br>
+                            <p>${kategorier.lang}</p>
+                                <br>
+                            <p>Oprindelse: ${kategorier.oprindelse}</p>
+                                <br> <br>
+                            <p>Pris: ${kategorier.pris},-</p>
+                        </article>
+                        `;
+                            document.querySelector("#popup").style.display = "block";
+                        }
+                    }
+                })
+            }
+            //function visKategorier slut
+            //            document.querySelectorAll(".filter").forEach(elm => {
+            //                elm.addEventListener("click", filtrering);
+            //
+            //            })
+            document.querySelector("#luk button").addEventListener("click", () => {
+                document.querySelector("#popup").style.display = "none";
+            })
+            document.querySelectorAll(".filter").forEach(elm => {
+                elm.addEventListener("click", filtrering);
+            })
+
+            function filtrering() {
+                filter = this.getAttribute("data-hold");
+                document.querySelector("h2").textContent = this.textContent;
+                document.querySelectorAll(".filter").forEach(elm => {
+                    elm.classList.remove("valgt");
+                })
+                this.classList.add("valgt");
+                console.log("filter", filter);
+                visKategorier();
+            }
+            getJson();
+        }
+
+    </script>
+</body>
+
+</html>
