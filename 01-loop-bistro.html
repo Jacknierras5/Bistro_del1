@@ -139,8 +139,108 @@
         footer p {
             margin-left: 2rem;
         }
-
     </style>
 
 
 </head>
+
+
+
+
+<body>
+
+
+    <div class="round">
+        <img src="logo.png" alt="">
+    </div>
+    <header>
+        <nav class="menu">
+            <button class="filter valgt" data-hold="alle">Forside</button>
+            <button class="filter" data-hold="forretter">Forret</button>
+            <button class="filter" data-hold="hovedretter">Hovedret</button>
+            <button class="filter" data-hold="desserter">Dessert</button>
+            <button class="filter" data-hold="sideorders">Små retter</button>
+            <button class="filter" data-hold="drikkevarer">Drikkevarer</button>
+        </nav>
+
+    </header>
+
+
+
+    <section id=liste></section>
+
+    <footer>
+        <div>Adresse: Solvænget 97 <br> 1234 Køkbenhavn Ø </div>
+        <br>
+        <div>Åbningstider: Mandag-fredag 10:00-22:00 <br> Lørdag 12:00-23:00 </div>
+    </footer>
+
+
+
+
+
+    <script>
+        let alleKategorier = [];
+        let filter = "alle";
+        let kategorier;
+        let kategori;
+
+        document.addEventListener("DOMContentLoaded", start);
+
+        function start() {
+            let dest = document.querySelector("#liste");
+            async function getJson() {
+                let jsonData = await fetch("https://mandalskeawebspace.dk/claude_php/clean_up_spreadsheet.php?id=1jxxxFoWBuMJ1qhQ9BQIAyKHmP38XtAF9_sQr0xo5JLo");
+                alleKategorier = await jsonData.json();
+                //                alleKategorierr.sort((a, b) => {
+                //                    return a.alder - b.alder
+                //                })
+                alleKategorier.sort((a, b) => {
+                    return a.navn.localeCompare(b.navn);
+                });
+                visKategorier();
+            }
+
+            function visKategorier() {
+                dest.innerHTML = "";
+                alleKategorier.forEach(kategorier => {
+                    if (filter == "alle" || filter == kategorier.kategori) {
+                        let template = `
+                        <article class="kategorier">
+                            <h2>${kategorier.navn}</h2>
+                            <img src="bistro_billeder/imgs/small/${kategorier.billede}-sm.jpg"</p>
+                                <br>
+                            <p>Om: ${kategorier.kort}</p><br>
+                            <p>Oprindelse: ${kategorier.oprindelse}</p>
+                                <br>
+                            <b>Pris: ${kategorier.pris},-</b>
+                        </article>
+                        `;
+                        dest.insertAdjacentHTML("beforeend", template);
+                        dest.lastElementChild.addEventListener("click", () => {
+                            location.href = "02-singleview.html?id=" + kategorier.id;
+                        });
+                    }
+                });
+            }
+            //function visKategorier slut
+            document.querySelectorAll(".filter").forEach(elm => {
+                elm.addEventListener("click", filtrering);
+            })
+
+            function filtrering() {
+                filter = this.getAttribute("data-hold");
+                document.querySelector("h2").textContent = this.textContent;
+                document.querySelectorAll(".filter").forEach(elm => {
+                    elm.classList.remove("valgt");
+                })
+                this.classList.add("valgt");
+                visKategorier();
+            }
+            getJson();
+        }
+    </script>
+</body>
+
+</html>
+
